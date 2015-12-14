@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="listArrayColors">
+        <item>Red</item>
+        <item>Green</item>
+        <item>Blue</item>
+        <item>White</item>
+        <item>Gray</item>
+    </string-array>
+
+    <string-array name="listValuesColors">
+        <item>RED</item>
+        <item>GREEN</item>
+        <item>BLUE</item>
+        <item>WHITE</item>
+        <item>GRAY</item>
+    </string-array>
+
+    <string-array name="listArrayFonts">
+        <item>Small</item>
+        <item>Medium</item>
+        <item>Large</item>
+    </string-array>
+
+    <string-array name="listValuesFonts">
+        <item>Small</item>
+        <item>Medium</item>
+        <item>Large</item>
+    </string-array>
+</resources>

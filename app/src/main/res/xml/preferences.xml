@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ListPreference android:title="Background color"
+        android:summary="Select the color of the background"
+        android:key="backgroundColor"
+        android:defaultValue="White"
+        android:entries="@array/listArrayColors"
+        android:entryValues="@array/listValuesColors" />
+    
+    <ListPreference android:title="Buttons color"
+        android:summary="Select the color of the buttons"
+        android:key="buttonsColor"
+        android:defaultValue="Grey"
+        android:entries="@array/listArrayColors"
+        android:entryValues="@array/listValuesColors" />
+
+    <ListPreference android:title="Font size"
+        android:summary="Select the font size"
+        android:key="fontSize"
+        android:entries="@array/listArrayFonts"
+        android:entryValues="@array/listValuesFonts" />
+
+</PreferenceScreen>
