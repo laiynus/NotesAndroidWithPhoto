@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".activity.UpdateNoteActivity"
+    tools:showIn="@layout/activity_update_note"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true"
+    android:orientation="vertical"
+    android:gravity="center">
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerInParent="true">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+            <ImageView
+                android:layout_width="167dp"
+                android:layout_height="167dp"
+                android:id="@+id/imageViewUpdateNote"
+                android:src="@drawable/ic_no_image"
+                android:layout_gravity="center"/>
+
+            <Button
+                android:layout_width="362dp"
+                android:layout_height="wrap_content"
+                android:text="@string/selectPhoto"
+                android:id="@+id/selectPhotoUpdateButton"/>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="116dp"
+                android:inputType="textMultiLine"
+                android:ems="10"
+                android:id="@+id/noteTextUpdate" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="date"
+                android:ems="10"
+                android:id="@+id/dateModifyUpdate"/>
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/action_update"
+                android:id="@+id/button_update" />
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>

@@ -1,21 +1,16 @@
 package by.khrapovitsky.activity;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.FragmentManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,27 +22,28 @@ import android.widget.Toast;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import by.khrapovitsky.R;
+import by.khrapovitsky.fragment.RetainedFragment;
+import by.khrapovitsky.fragment.SelectPhotoDialog;
 import by.khrapovitsky.helper.DatabaseHelper;
+import by.khrapovitsky.model.BitmapAndPath;
 import by.khrapovitsky.model.Note;
+import by.khrapovitsky.util.BitmapUtil;
 
 public class CreateNoteActivity extends AppCompatActivity implements View.OnClickListener{
+
+    private RetainedFragment dataFragment;
 
     private Button createButton = null;
     private Button selectPhoto = null;
     private EditText noteText = null;
     private ImageView imageView = null;
     private String pathImage = null;
+    private Bitmap bitmap = null;
     private DatabaseHelper databaseHelper = new DatabaseHelper(this);
-
-    private final static int REQUEST_CAMERA = 0, SELECT_FILE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +60,26 @@ public class CreateNoteActivity extends AppCompatActivity implements View.OnClic
         selectPhoto.setOnClickListener(this);
         imageView = (ImageView) findViewById(R.id.imageViewNote);
         noteText = (EditText) findViewById(R.id.noteTextCreate);
+        FragmentManager fm = getSupportFragmentManager();
+        dataFragment = (RetainedFragment) fm.findFragmentByTag("data");
+        if (savedInstanceState == null) {
+            dataFragment = new RetainedFragment();
+            fm.beginTransaction().add(dataFragment, "data").commit();
+        }else{
+            bitmap = dataFragment.getData().getBitmap();
+            pathImage = dataFragment.getData().getPath();
+            if(bitmap!=null){
+                imageView.setImageBitmap(bitmap);
+            }
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        View view = this.findViewById(android.R.id.content);
+        view.setBackgroundColor(Color.parseColor(preferences.getString("backgroundColor", "WHITE")));
     }
 
     @Override
@@ -93,11 +109,18 @@ public class CreateNoteActivity extends AppCompatActivity implements View.OnClic
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == SELECT_FILE){
-                imageView.setImageBitmap(onSelectFromGalleryResult(data));
+            BitmapUtil bitmapUtil = new BitmapUtil(CreateNoteActivity.this);
+            if (requestCode == SelectPhotoDialog.SELECT_FILE){
+                BitmapAndPath tmp = bitmapUtil.onSelectFromGalleryResult(data);
+                bitmap = tmp.getBitmap();
+                pathImage = tmp.getPath();
+                imageView.setImageBitmap(bitmap);
             }
-            else if (requestCode == REQUEST_CAMERA){
-                imageView.setImageBitmap(onCaptureImageResult(data));
+            else if (requestCode == SelectPhotoDialog.REQUEST_CAMERA){
+                BitmapAndPath tmp = bitmapUtil.onCaptureImageResult(data);
+                bitmap = tmp.getBitmap();
+                pathImage = tmp.getPath();
+                imageView.setImageBitmap(bitmap);
             }
         }
     }
@@ -106,6 +129,12 @@ public class CreateNoteActivity extends AppCompatActivity implements View.OnClic
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        dataFragment.setData(new BitmapAndPath(bitmap,pathImage));
     }
 
     @Override
@@ -121,93 +150,7 @@ public class CreateNoteActivity extends AppCompatActivity implements View.OnClic
         }
     }
 
-    private Bitmap onSelectFromGalleryResult(Intent data) {
-        String selectedImagePath = getURIofImage(data);
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(selectedImagePath, options);
-        final int REQUIRED_SIZE = 200;
-        int scale = 1;
-        while (options.outWidth / scale / 2 >= REQUIRED_SIZE
-                && options.outHeight / scale / 2 >= REQUIRED_SIZE)
-            scale *= 2;
-        options.inSampleSize = scale;
-        options.inJustDecodeBounds = false;
-        pathImage = selectedImagePath;
-        return BitmapFactory.decodeFile(selectedImagePath, options);
-    }
 
-    private Bitmap onCaptureImageResult(Intent data){
-        Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        if (thumbnail != null) {
-            thumbnail.compress(Bitmap.CompressFormat.PNG, 50, bytes);
-        }
-        File destination = new File(Environment.getExternalStorageDirectory(), System.currentTimeMillis() + ".png");
 
-        FileOutputStream fo;
-        try {
-            destination.createNewFile();
-            fo = new FileOutputStream(destination);
-            fo.write(bytes.toByteArray());
-            fo.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        pathImage = getURIofImage(data);
-        return thumbnail;
-    }
-
-    private String getURIofImage(Intent data){
-        Uri selectedImageUri = data.getData();
-        String[] projection = { MediaStore.MediaColumns.DATA };
-        Cursor cursor = getContentResolver().query(selectedImageUri, projection, null, null, null);
-        int column_index = 0;
-        String selectedImagePath = null;
-        if (cursor != null) {
-            column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-            cursor.moveToFirst();
-            selectedImagePath = cursor.getString(column_index);
-        }
-        return selectedImagePath;
-    }
-
-    public static class SelectPhotoDialog extends DialogFragment {
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            final CharSequence[] items = { "Take Photo", "Choose from Gallery"};
-
-            builder.setItems(items, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int item) {
-                    if (items[item].equals("Take Photo")) {
-                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                        getActivity().startActivityForResult(intent, REQUEST_CAMERA);
-                    } else if (items[item].equals("Choose from Gallery")) {
-                        Intent intent = new Intent(
-                                Intent.ACTION_PICK,
-                                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                        intent.setType("image/*");
-                        getActivity().startActivityForResult(
-                                Intent.createChooser(intent, "Select File"),
-                                SELECT_FILE);
-                    }
-                }
-            });
-
-            builder.setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
-
-            builder.setTitle(R.string.selectPhoto);
-            Dialog dialog = builder.create();
-            return dialog;
-        }
-    }
 
 }

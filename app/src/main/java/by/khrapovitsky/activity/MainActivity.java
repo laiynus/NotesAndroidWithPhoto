@@ -33,7 +33,7 @@ import java.net.URL;
 
 import by.khrapovitsky.R;
 import by.khrapovitsky.adapter.NotesCursorAdapter;
-import by.khrapovitsky.dialog.AboutDialog;
+import by.khrapovitsky.fragment.AboutDialog;
 import by.khrapovitsky.helper.DatabaseHelper;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {

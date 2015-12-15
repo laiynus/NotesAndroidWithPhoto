@@ -1,4 +1,4 @@
-package by.khrapovitsky.dialog;
+package by.khrapovitsky.fragment;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

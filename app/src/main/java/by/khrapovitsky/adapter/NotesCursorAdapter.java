@@ -1,12 +1,9 @@
 package by.khrapovitsky.adapter;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.util.LruCache;
 import android.view.View;
@@ -46,13 +43,14 @@ public class NotesCursorAdapter extends ResourceCursorAdapter {
         idNote.setText(id.toString());
         note.setText(noteText);
         String path = cursor.getString(cursor.getColumnIndexOrThrow("imagePath"));
-        if(path==null)
+        if (path == null)
             path = "-1";
         Bitmap bitmap = getBitmapFromMemCache(path);
-        if(bitmap==null){
-            bitmap =  getImage(path);
+        if (bitmap == null) {
+            bitmap = getImage(path);
+            addBitmapToMemoryCache(path, bitmap);
             imageNote.setImageBitmap(bitmap);
-        }else{
+        } else {
             imageNote.setImageBitmap(bitmap);
         }
         lastDateModify.setText(date);
@@ -60,8 +58,8 @@ public class NotesCursorAdapter extends ResourceCursorAdapter {
 
     private Bitmap getImage(String path) {
         Bitmap bitmap = null;
-        if(path!=null){
-            if(!path.equals("-1")) {
+        if (path != null) {
+            if (!path.equals("-1")) {
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inJustDecodeBounds = true;
                 BitmapFactory.decodeFile(Uri.parse(path).getPath(), options);
@@ -73,12 +71,11 @@ public class NotesCursorAdapter extends ResourceCursorAdapter {
                 options.inSampleSize = scale;
                 options.inJustDecodeBounds = false;
                 bitmap = BitmapFactory.decodeFile(Uri.parse(path).getPath(), options);
-                addBitmapToMemoryCache(path, bitmap);
             }
         }
-        if(bitmap == null)
-            bitmap = BitmapFactory.decodeResource(context.getResources(),R.drawable.ic_no_image);
-            addBitmapToMemoryCache("-1",bitmap);
+        if (bitmap == null) {
+            bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_no_image);
+        }
         return bitmap;
     }
 

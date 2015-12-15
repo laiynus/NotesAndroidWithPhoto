@@ -1,35 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:weightSum="1">
+    android:fitsSystemWindows="true"
+    android:layout_gravity="center"
+    tools:context=".activity.CreateNoteActivity">
 
+    <include layout="@layout/content_create" />
 
-    <ImageView
-        android:layout_width="232dp"
-        android:layout_height="192dp"
-        android:id="@+id/imageViewNote"
-        android:layout_gravity="center_horizontal"
-        android:src="@drawable/ic_no_image" />
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/selectPhoto"
-        android:id="@+id/selectPhotoButton"/>
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textMultiLine"
-        android:ems="10"
-        android:id="@+id/noteTextCreate"
-        android:layout_weight="0.61" />
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/action_create"
-        android:id="@+id/noteButtonCreate" />
-
-</LinearLayout>
+</android.support.design.widget.CoordinatorLayout>
